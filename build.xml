@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="Shift-JIS"?>
+
+<project name="ParticleSimulator" default="compile" basedir=".">
+  <property name="DIR_SOURCE"          value="src" />
+  <property name="DIR_CLASS"           value="classes" />
+  <property name="DIR_DOC"             value="doc" />
+  <property name="DIR_JAR"             value="jar" />
+  <property name="DIR_JAVADOC"         value="javadocs" />
+  <property name="DIR_LIB"             value="lib" />
+  <property name="DIR_SAMPLES"         value="sample" />
+  <property name="DIR_PRODUCT"         value="ParticleSimulator" />
+  <property name="JAR_NAME"            value="ParticleSimulator" />
+  <property name="PACKAGE_PATH"        value="simurator" />
+  <property name="MAIN_CLASS"          value="simurator.ParticleSimulatorMain" />
+  
+  <property file="build.properties" />
+  
+  <!-- ********************************************************************************-->
+  <fileset id="JAR_LIBRARIES" dir="${DIR_LIB}">
+      <include name="log4j-1.2.16.jar" />
+  </fileset>
+  
+  <!-- ********************************************************************************-->
+  <fileset id="SAMPLES" dir="${DIR_SAMPLES}">
+    <include name="sample_particle.dat" />
+    <include name="sample_particle.properties" />
+  </fileset>
+  
+  <!-- ********************************************************************************-->
+  <path id="base.classpath">
+    <pathelement path="${DIR_CLASS}" />
+    <fileset refid="JAR_LIBRARIES" />
+  </path>
+  
+  <!-- ********************************************************************************-->
+  <target name="clean">
+    <delete quiet="true" >
+      <fileset dir="${DIR_CLASS}" casesensitive="yes">
+        <patternset id="CLASS_FILES">
+          <include name="**/*.class" />
+        </patternset>
+      </fileset>
+    </delete>
+    
+    <delete dir="${DIR_CLASS}" />
+    <delete dir="${DIR_JAVADOC}" />
+    <delete dir="${DIR_JAR}" />
+  </target>
+  
+  <!-- ********************************************************************************-->
+  <target name="prepare">
+    <tstamp />
+    <mkdir dir="${DIR_CLASS}/${PACKAGE_PATH}/resource" />
+  </target>
+  
+  <!-- ********************************************************************************-->
+  <target name="compile" depends="prepare">
+    <javac
+      deprecation="yes"
+      srcdir="${DIR_SOURCE}"
+      destdir="${DIR_CLASS}"
+      encoding="Windows-31J"
+      debug="true"
+      includeantruntime="false"
+      classpathref="base.classpath"
+      sourcepath="${DIR_SOURCE}">
+    </javac>
+  </target>
+  
+  <!-- ********************************************************************************-->
+  <target name="run" depends="compile">
+    <java classname="${MAIN_CLASS}" fork="true">
+      <classpath refid="base.classpath" />
+      <jvmarg value="-Xmx${MAX_HEAP_IN_MB}M" />
+      <arg line="${ARGS}" />
+    </java>
+  </target>
+  
+  <!-- ********************************************************************************-->
+  <target name="jar" depends="clean, compile">
+    <mkdir dir="${DIR_JAR}" />
+    <jar jarfile="${DIR_JAR}/${JAR_NAME}-${DSTAMP}.jar" basedir="${DIR_CLASS}">
+    </jar>
+  </target>
+  
+  <!-- ********************************************************************************-->
+  <target name="javadoc">
+    <javadoc destdir="${DIR_JAVADOC}">
+      <fileset dir="${DIR_SOURCE}" />
+    </javadoc>
+  </target>
+</project>
